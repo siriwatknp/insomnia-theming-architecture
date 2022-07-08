@@ -12,7 +12,7 @@ module.exports = {
   displayName: "Early Riser",
   theme: {
     background: {
-      default: "#fff",
+      default: white,
       success: green,
       notice: yellow,
       warning: yellow,
@@ -21,7 +21,7 @@ module.exports = {
       info: blue,
     },
     foreground: {
-      default: "#000",
+      default: black,
       success: white,
       notice: white,
       warning: white,
@@ -41,12 +41,12 @@ module.exports = {
     styles: {
       sidebar: {
         background: {
-          default: "#f9f9f9",
+          default: nearWhite,
         },
       },
       dialog: {
         background: {
-          default: "#fff",
+          default: white,
         },
       },
       paneHeader: {
