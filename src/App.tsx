@@ -7,6 +7,7 @@ import {
 } from "@mui/material/styles";
 import { deepmerge } from "@mui/utils";
 import { red } from "@mui/material/colors";
+import { GoGitMerge, GoGear, GoPerson, GoTriangleDown } from "react-icons/go";
 import CssBaseline from "@mui/material/CssBaseline";
 import AppBar from "@mui/material/AppBar";
 import Typography from "@mui/material/Typography";
@@ -20,11 +21,19 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import IconButton from "@mui/material/IconButton";
 import Select from "@mui/material/Select";
 import InputBase from "@mui/material/InputBase";
-import { GoGitMerge, GoGear, GoPerson, GoTriangleDown } from "react-icons/go";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
+import TextField from "@mui/material/TextField";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 
 import logo from "./insomnia.svg";
+import dracular from "./themes/dracular";
+import electron from "./themes/electron-highlighter";
+import earlyRiser from "./themes/early-riser";
 
 declare module "@mui/material/styles" {
   interface ThemeOptions {
@@ -103,65 +112,16 @@ const insomniaTheme: ThemeOptions = {
   },
 };
 
-const pluginTheme = {
-  background: {
-    default: "#282a36",
-    success: "#50fa7b",
-    notice: "#f1fa8c",
-    warning: "#ffb86c",
-    danger: "#ff5555",
-    surprise: "#bd93f9",
-    info: "#8be9fd",
-  },
-  foreground: {
-    default: "#f8f8f2",
-    success: "#282a36",
-    notice: "#282a36",
-    warning: "#282a36",
-    danger: "#282a36",
-    surprise: "#282a36",
-    info: "#282a36",
-  },
-  highlight: {
-    default: "rgba(98, 114, 164, .5)",
-    xxs: "rgba(98, 114, 164, 0.05)",
-    xs: "rgba(98, 114, 164, 0.1)",
-    sm: "rgba(98, 114, 164, 0.2)",
-    md: "rgba(98, 114, 164, 0.4)",
-    lg: "rgba(98, 114, 164, 0.6)",
-    xl: "rgba(98, 114, 164, 0.8)",
-  },
-  styles: {
-    sidebar: {
-      background: {
-        default: "#0f1c23",
-      },
-    },
-    dialog: {
-      background: {
-        default: "#1b2b34",
-      },
-    },
-    paneHeader: {
-      background: {
-        success: "#5fb3b3",
-        notice: "#fac863",
-        warning: "#fac863",
-        danger: "#ed6f7d",
-        surprise: "#5fb3b3",
-        info: "#5a9bcf",
-      },
-    },
-    transparentOverlay: {
-      background: {
-        default: "rgba(27, 43, 52, 0.5)",
-      },
-    },
-  },
-};
+// Uncomment theme to see the result
+const selectedTheme = earlyRiser;
+// const selectedTheme = electron;
+// const selectedTheme = dracular;
+
+const pluginTheme = selectedTheme.theme;
 
 export default function App() {
   const [tabIndex, setTabIndex] = React.useState(0);
+  const [dialogOpen, setDialogOpen] = React.useState(false);
   // Split theming into multiple parts. For Each part, decide the palette mode base on its background & foreground contrast and let MUI
   // generate appropriate colors for every components inside that scope.
   const paneTheme = createTheme({
@@ -169,7 +129,7 @@ export default function App() {
       palette: {
         mode:
           getContrastRatio(
-            "rgba(0 0 0 / 0.87)",
+            "#121212",
             pluginTheme.styles.sidebar.background.default
           ) > 4.5
             ? "light"
@@ -185,9 +145,27 @@ export default function App() {
     ...deepmerge(insomniaTheme, {
       palette: {
         mode:
+          getContrastRatio("#121212", pluginTheme.background.default) > 4.5
+            ? "light"
+            : "dark",
+        background: {
+          default: pluginTheme.background.default,
+        },
+        text: {
+          primary: pluginTheme.foreground.default,
+        },
+      },
+    }),
+    insomnia: pluginTheme,
+  });
+  console.log(bodyTheme);
+  const dialogTheme = createTheme({
+    ...deepmerge(insomniaTheme, {
+      palette: {
+        mode:
           getContrastRatio(
-            pluginTheme.foreground.default,
-            pluginTheme.background.default
+            "#121212",
+            pluginTheme.styles.dialog.background.default
           ) > 4.5
             ? "light"
             : "dark",
@@ -197,7 +175,6 @@ export default function App() {
   });
   return (
     <div>
-      <CssBaseline />
       <ThemeProvider theme={paneTheme}>
         <AppBar
           position="relative"
@@ -230,7 +207,7 @@ export default function App() {
             <Button variant="contained" startIcon={<GoGitMerge />}>
               Setup Git sync
             </Button>
-            <IconButton>
+            <IconButton onClick={() => setDialogOpen(true)}>
               <GoGear />
             </IconButton>
             <IconButton>
@@ -281,6 +258,7 @@ export default function App() {
           </Box>
         </ThemeProvider>
         <ThemeProvider theme={bodyTheme}>
+          <CssBaseline />
           <Box
             sx={{
               flexGrow: 1,
@@ -317,6 +295,30 @@ export default function App() {
           <Box sx={{ flexGrow: 1 }}></Box>
         </ThemeProvider>
       </Box>
+      <ThemeProvider theme={dialogTheme}>
+        <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+          <DialogTitle>Subscribe</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              To subscribe to this website, please enter your email address
+              here. We will send updates occasionally.
+            </DialogContentText>
+            <TextField
+              autoFocus
+              margin="dense"
+              id="name"
+              label="Email Address"
+              type="email"
+              fullWidth
+              variant="standard"
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
+            <Button onClick={() => setDialogOpen(false)}>Subscribe</Button>
+          </DialogActions>
+        </Dialog>
+      </ThemeProvider>
     </div>
   );
 }
